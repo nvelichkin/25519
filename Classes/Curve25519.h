@@ -40,6 +40,6 @@
 
 + (ECKeyPair*)generateKeyPair;
 
-+(ECKeyPair*)generateKeyPairBySeed:(NSData*)seed;
++ (ECKeyPair*)generateKeyPairBySeed:(unsigned char*)seed;
 
 @end

@@ -75,10 +75,10 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     return keyPair;
 }
 
-+(ECKeyPair*)generateKeyPairBySeed:(NSData*)seed {
++(ECKeyPair*)generateKeyPairBySeed:(unsigned char*)seed {
     ECKeyPair* keyPair =[[ECKeyPair alloc] init];
     
-    crypto_hash_sha512(keyPair->privateKey, [seed bytes], 32);
+    crypto_hash_sha512(keyPair->privateKey, seed, 32);
     keyPair->privateKey[0]  &= 248;
     keyPair->privateKey[31] &= 127;
     keyPair->privateKey[31] |= 64;
@@ -139,6 +139,10 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 
 +(ECKeyPair*)generateKeyPair{
     return [ECKeyPair generateKeyPair];
+}
+
++(ECKeyPair*)generateKeyPairBySeed:(unsigned char*)seed {
+    return [ECKeyPair generateKeyPairBySeed:seed];
 }
 
 +(NSData*)generateSharedSecretFromPublicKey:(NSData *)theirPublicKey andKeyPair:(ECKeyPair *)keyPair{
