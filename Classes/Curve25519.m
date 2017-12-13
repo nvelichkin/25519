@@ -8,6 +8,8 @@
 
 #import "Curve25519.h"
 #import "Randomness.h"
+#import "ge.h"
+#import "crypto_hash_sha512.h"
 
 NSString * const TSECKeyPairPublicKey   = @"TSECKeyPairPublicKey";
 NSString * const TSECKeyPairPrivateKey  = @"TSECKeyPairPrivateKey";
@@ -65,6 +67,28 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     
     static const uint8_t basepoint[ECCKeyLength] = {9};
     curve25519_donna(keyPair->publicKey, keyPair->privateKey, basepoint);
+    
+    ge_p3 A;
+    ge_scalarmult_base(&A, keyPair->privateKey);
+    ge_p3_tobytes(keyPair->publicKey, &A);
+
+    return keyPair;
+}
+
++(ECKeyPair*)generateKeyPairBySeed:(NSData*)seed {
+    ECKeyPair* keyPair =[[ECKeyPair alloc] init];
+    
+    crypto_hash_sha512(keyPair->privateKey, [seed bytes], 32);
+    keyPair->privateKey[0]  &= 248;
+    keyPair->privateKey[31] &= 127;
+    keyPair->privateKey[31] |= 64;
+    
+    static const uint8_t basepoint[ECCKeyLength] = {9};
+    curve25519_donna(keyPair->publicKey, keyPair->privateKey, basepoint);
+    
+    ge_p3 A;
+    ge_scalarmult_base(&A, keyPair->privateKey);
+    ge_p3_tobytes(keyPair->publicKey, &A);
     
     return keyPair;
 }
