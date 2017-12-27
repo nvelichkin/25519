@@ -67,10 +67,6 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     
     static const uint8_t basepoint[ECCKeyLength] = {9};
     curve25519_donna(keyPair->publicKey, keyPair->privateKey, basepoint);
-    
-    ge_p3 A;
-    ge_scalarmult_base(&A, keyPair->privateKey);
-    ge_p3_tobytes(keyPair->publicKey, &A);
 
     return keyPair;
 }
