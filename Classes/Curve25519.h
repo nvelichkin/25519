@@ -42,4 +42,6 @@
 
 + (ECKeyPair*)generateKeyPairBySeed:(unsigned char*)seed;
 
++ (NSData*)signatures:(NSData*)secretKey message:(NSData*)message;
+
 @end

@@ -10,6 +10,7 @@
 #import "Randomness.h"
 #import "ge.h"
 #import "crypto_hash_sha512.h"
+#import "crypto_sign.h"
 
 NSString * const TSECKeyPairPublicKey   = @"TSECKeyPairPublicKey";
 NSString * const TSECKeyPairPrivateKey  = @"TSECKeyPairPrivateKey";
@@ -143,6 +144,22 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 
 +(NSData*)generateSharedSecretFromPublicKey:(NSData *)theirPublicKey andKeyPair:(ECKeyPair *)keyPair{
     return [keyPair generateSharedSecretFromPublicKey:theirPublicKey];
+}
+
+
++ (NSData*)signatures:(NSData*)secretKey message:(NSData*)message {
+    
+    NSMutableData *outData = [NSMutableData dataWithLength:crypto_sign_BYTES];
+    unsigned char *sig = [outData mutableBytes];
+    const unsigned char *m = [message bytes];
+    unsigned long long mlen = [message length];
+    const unsigned char *sk = [secretKey bytes];
+    unsigned long long smlen_p;
+    crypto_sign(sig, &smlen_p, m, mlen, sk);
+    
+    NSLog(@"%d %@", (int)outData.length, outData.description);
+    
+    return outData;
 }
 
 @end
