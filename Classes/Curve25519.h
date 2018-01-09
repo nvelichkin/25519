@@ -46,4 +46,6 @@
 
 + (NSData*)cryptoHashSha512:(NSData*)publicKey;
 
++ (void)cryptoHashSha512:(unsigned char*)hash publicKey:(unsigned char*)publicKey;
+
 @end

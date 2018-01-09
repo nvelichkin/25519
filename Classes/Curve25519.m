@@ -169,4 +169,8 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     return outData;
 }
 
++ (void)cryptoHashSha512:(unsigned char*)hash publicKey:(unsigned char*)publicKey {
+    crypto_hash_sha512(hash, publicKey, 32);
+}
+
 @end
