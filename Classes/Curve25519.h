@@ -44,4 +44,6 @@
 
 + (NSData*)signatures:(NSData*)secretKey message:(NSData*)message;
 
++ (NSData*)cryptoHashSha512:(NSData*)publicKey;
+
 @end

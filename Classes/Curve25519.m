@@ -162,4 +162,11 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     return outData;
 }
 
++ (NSData*)cryptoHashSha512:(NSData*)publicKey {
+    NSMutableData *outData = [NSMutableData dataWithLength:64];
+    unsigned char *hash = [outData mutableBytes];
+    crypto_hash_sha512(hash, [publicKey bytes], 32);
+    return outData;
+}
+
 @end
