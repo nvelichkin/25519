@@ -58,10 +58,11 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 
 
 +(ECKeyPair*)generateKeyPair{
-    ECKeyPair* keyPair =[[ECKeyPair alloc] init];
+    
+    ECKeyPair* keyPair = [[ECKeyPair alloc] init];
     
     // Generate key pair as described in https://code.google.com/p/curve25519-donna/
-    memcpy(keyPair->privateKey, [[Randomness  generateRandomBytes:32] bytes], 32);
+    memcpy(keyPair->privateKey, [[Randomness  generateRandomBytes:ECCKeyLength] bytes], ECCKeyLength);
     keyPair->privateKey[0]  &= 248;
     keyPair->privateKey[31] &= 127;
     keyPair->privateKey[31] |= 64;
@@ -73,9 +74,12 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 }
 
 +(ECKeyPair*)generateKeyPairBySeed:(unsigned char*)seed {
-    ECKeyPair* keyPair =[[ECKeyPair alloc] init];
     
-    crypto_hash_sha512(keyPair->privateKey, seed, 32);
+    ECKeyPair* keyPair = [[ECKeyPair alloc] init];
+    
+    unsigned char hash[64];
+    crypto_hash_sha512(hash, seed, ECCKeyLength);
+    memcpy(keyPair->privateKey, hash, ECCKeyLength);
     keyPair->privateKey[0]  &= 248;
     keyPair->privateKey[31] &= 127;
     keyPair->privateKey[31] |= 64;
@@ -91,7 +95,7 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 }
 
 -(NSData*) publicKey {
-    return [NSData dataWithBytes:self->publicKey length:32];
+    return [NSData dataWithBytes:self->publicKey length:ECCKeyLength];
 }
 
 -(NSData*) sign:(NSData*)data{
@@ -110,11 +114,11 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 -(NSData*) generateSharedSecretFromPublicKey:(NSData*)theirPublicKey {
     unsigned char *sharedSecret = NULL;
     
-    if ([theirPublicKey length] != 32) {
+    if ([theirPublicKey length] != ECCKeyLength) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"The supplied public key does not contain 32 bytes" userInfo:nil];
     }
     
-    sharedSecret = malloc(32);
+    sharedSecret = malloc(ECCKeyLength);
     
     if (sharedSecret == NULL) {
         free(sharedSecret);
@@ -123,7 +127,7 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     
     curve25519_donna(sharedSecret,self->privateKey, [theirPublicKey bytes]);
     
-    NSData *sharedSecretData = [NSData dataWithBytes:sharedSecret length:32];
+    NSData *sharedSecretData = [NSData dataWithBytes:sharedSecret length:ECCKeyLength];
     
     free(sharedSecret);
     
@@ -165,12 +169,12 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 + (NSData*)cryptoHashSha512:(NSData*)publicKey {
     NSMutableData *outData = [NSMutableData dataWithLength:64];
     unsigned char *hash = [outData mutableBytes];
-    crypto_hash_sha512(hash, [publicKey bytes], 32);
+    crypto_hash_sha512(hash, [publicKey bytes], ECCKeyLength);
     return outData;
 }
 
 + (void)cryptoHashSha512:(unsigned char*)hash publicKey:(unsigned char*)publicKey {
-    crypto_hash_sha512(hash, publicKey, 32);
+    crypto_hash_sha512(hash, publicKey, ECCKeyLength);
 }
 
 @end
