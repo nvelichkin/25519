@@ -152,17 +152,16 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 
 
 + (NSData*)signatures:(NSData*)secretKey message:(NSData*)message {
-    
-    NSMutableData *outData = [NSMutableData dataWithLength:crypto_sign_BYTES];
-    unsigned char *sig = [outData mutableBytes];
     const unsigned char *m = [message bytes];
     unsigned long long mlen = [message length];
     const unsigned char *sk = [secretKey bytes];
     unsigned long long smlen_p;
+    NSMutableData *sigData = [NSMutableData dataWithLength:crypto_sign_BYTES + mlen];
+    unsigned char *sig = [sigData mutableBytes];
     crypto_sign(sig, &smlen_p, m, mlen, sk);
-    
-    NSLog(@"%d %@", (int)outData.length, outData.description);
-    
+    NSMutableData *outData = [NSMutableData dataWithLength:crypto_sign_BYTES];
+    unsigned char *outD = [outData mutableBytes];
+    memcpy(outD, sig, crypto_sign_BYTES);
     return outData;
 }
 
