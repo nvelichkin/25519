@@ -10,14 +10,19 @@
 #define ECCKeyLength 32
 #define ECCSignatureLength 64
 
+// MARK: - ECKeyPair
+
 @interface ECKeyPair : NSObject <NSSecureCoding> {
     uint8_t publicKey [ECCKeyLength];
     uint8_t privateKey[ECCKeyLength];
 }
 
 -(NSData*) publicKey;
+-(NSData*) privateKey;
 
 @end
+
+// MARK: - Curve25519
 
 @interface Curve25519 : NSObject
 
@@ -31,6 +36,9 @@
  */
 
 + (NSData*)generateSharedSecretFromPublicKey:(NSData*)theirPublicKey andKeyPair:(ECKeyPair*)keyPair;
+
++ (NSData *)generateSharedSecretFromPublicKey:(NSData *)publicKey
+privateKey:(NSData *)privateKey;
 
 /**
  *  Generate a curve25519 key pair

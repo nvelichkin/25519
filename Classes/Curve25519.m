@@ -23,6 +23,8 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
                      const unsigned char* msg, const unsigned long msg_len,
                      const unsigned char* random); /* 64 bytes */
 
+// MARK: - ECKeyPair
+
 @implementation ECKeyPair
 
 + (BOOL)supportsSecureCoding{
@@ -98,6 +100,10 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
     return [NSData dataWithBytes:self->publicKey length:ECCKeyLength];
 }
 
+-(NSData*) privateKey {
+    return [NSData dataWithBytes:self->privateKey length:ECCKeyLength];
+}
+
 -(NSData*) sign:(NSData*)data{
     Byte signatureBuffer[ECCSignatureLength];
     NSData *randomBytes = [Randomness generateRandomBytes:64];
@@ -136,6 +142,8 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 
 @end
 
+// MARK: - Curve25519
+
 @implementation Curve25519
 
 +(ECKeyPair*)generateKeyPair{
@@ -148,6 +156,15 @@ extern int  curve25519_sign(unsigned char* signature_out, /* 64 bytes */
 
 +(NSData*)generateSharedSecretFromPublicKey:(NSData *)theirPublicKey andKeyPair:(ECKeyPair *)keyPair{
     return [keyPair generateSharedSecretFromPublicKey:theirPublicKey];
+}
+
++ (NSData *)generateSharedSecretFromPublicKey:(NSData *)publicKey
+                                            privateKey:(NSData *)privateKey
+{
+    NSMutableData *sharedSecretData = [NSMutableData dataWithLength:ECCKeyLength];
+    curve25519_donna(sharedSecretData.mutableBytes, privateKey.bytes, publicKey.bytes);
+
+    return [sharedSecretData copy];
 }
 
 
